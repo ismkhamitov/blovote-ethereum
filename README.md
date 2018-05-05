@@ -25,7 +25,7 @@ For smart-contracts compiling to `*.bin` and `*.abi` files `solc` tool is needed
 * `npm install -g solc` (command-line tool is named `solcjs`)
 
 For wrapping with Java-classes [web3j](https://web3j.io/) is needed:
-* `brew tap web3j/web3j\n`
+* `brew tap web3j/web3j`
 * `brew install web3j`
 
 Script for compiling contracts and wrapping them is implemented and can be called from root directory through command:
