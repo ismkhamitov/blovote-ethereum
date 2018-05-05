@@ -1,0 +1,2 @@
+solcjs contracts/* --bin --abi --optimize -o build/solc
+find . -iname "*.abi" | sed -e "s/\.abi//" | while read x; do web3j solidity generate $x.bin $x.abi -o build/java/ -p com.blovote.contracts; done
