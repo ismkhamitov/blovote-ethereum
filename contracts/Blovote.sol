@@ -24,15 +24,28 @@ contract Blovote {
     function getState() external view returns (Blovote.State);
 
 
+    function addFilterQuestion(Blovote.QType qType, bytes qTitle) external;
+
     function addQuestion(QType qtype, bytes qtitle) external;
+
+    function getFilterQuestionsCount() external view returns (uint);
 
     function getQuestionsCount() external view returns (uint);
 
     function getQuestionInfo(uint index) external view returns (QType, bytes);
 
+    function getFilterQuestionInfo(uint index) external view returns (QType, bytes, uint[]);
+
+
+    function addFilterQuestionPoint(uint qIndex, bytes qText, bool isRight) external;
+
     function addQuestionPoint(uint qIndex, bytes ansText) external;
 
+    function getFilterQuestionPointsCount(uint index) external view returns (uint);
+
     function getQuestionPointsCount(uint qIndex) external view returns (uint);
+
+    function getFilterQuestionPointInfo(uint qIndex, uint pIndex) external view returns (bytes);
 
     function getQuestionPointInfo(uint qIndex, uint pointIndex) external view returns (bytes);
 

@@ -12,6 +12,13 @@ contract BlovoteImpl is Blovote {
         bytes[] points;
     }
 
+    struct FilterQuestion {
+        Blovote.QType qtype;
+        bytes title;
+        bytes[] points;
+        uint[] correctPoints;
+    }
+
     struct Respond {
         address respondentAddress;
         bool paid;
@@ -29,6 +36,7 @@ contract BlovoteImpl is Blovote {
     bytes public title;
     uint creationTime;
     uint public rewardSize;
+    FilterQuestion[] public filterQuestions;
     Question[] public quests;
 
     address zeroIndexRespondent;
@@ -61,9 +69,15 @@ contract BlovoteImpl is Blovote {
 
     modifier RequireQuestionExist(uint i) {
         require(
-            i >= 0 && i < quests.length && quests[i].title.length != 0,
+            i >= 0 && i < quests.length,
             "Question should exist"
         );
+        _;
+    }
+
+    modifier RequireQuestionPointExist(uint qIndex, uint pIndex) {
+        require(pIndex >= 0 && pIndex < quests[qIndex].points.length,
+                "Question point should exist");
         _;
     }
 
@@ -97,6 +111,26 @@ contract BlovoteImpl is Blovote {
             index >= 0 && index <= responds.length,
             "Respondent does not exists!"
         );
+        _;
+    }
+
+    modifier RequireFilterQuestionType(Blovote.QType qType) {
+        require(qType == Blovote.QType.OneFromMany || qType == Blovote.QType.ManyFromMany,
+                "Only One-from-many and Many-from-many questions can be filter questions");
+        _;
+    }
+
+    modifier RequireFilterQuestionExists(uint qIndex) {
+        require(
+            qIndex >= 0 && qIndex <= filterQuestions.length,
+            "Question with dat index does not exists"
+        );
+        _;
+    }
+
+    modifier RequireFilterQuestionPointExist(uint qIndex, uint pIndex) {
+        require(pIndex >= 0 && pIndex < filterQuestions[qIndex].points.length,
+                "Question point does not exist");
         _;
     }
 
@@ -134,14 +168,29 @@ contract BlovoteImpl is Blovote {
     }
 
 
+    function addFilterQuestion(Blovote.QType qType, bytes qTitle) external
+                                                            RequireFilterQuestionType(qType)
+                                                            RequireState(Blovote.State.New) {
+
+        require(qTitle.length != 0, "Question cannot be empty");
+        filterQuestions.push(FilterQuestion(qType, qTitle, new bytes[](0), new uint[](0)));
+    }
 
     function addQuestion(Blovote.QType qtype, bytes qtitle) external RequireState(Blovote.State.New) {
         require(qtitle.length != 0, "Question's title cannot be empty!");
         quests.push(Question(qtype, qtitle, new bytes[](0)));
     }
 
+    function getFilterQuestionsCount() external view returns (uint) {
+        return filterQuestions.length;
+    }
+
     function getQuestionsCount() external view returns (uint) {
         return quests.length;
+    }
+
+    function getFilterQuestionInfo(uint index) external view RequireFilterQuestionExists(index) returns (QType, bytes, uint[])  {
+        return (filterQuestions[index].qtype, filterQuestions[index].title, filterQuestions[index].correctPoints);
     }
 
     function getQuestionInfo(uint index) external view RequireQuestionExist(index) returns (QType, bytes) {
@@ -150,27 +199,47 @@ contract BlovoteImpl is Blovote {
 
 
 
-    function addQuestionPoint(uint qIndex, bytes ansText) external
+
+    function addFilterQuestionPoint(uint qIndex, bytes qText, bool isRight) external
+                                                          RequireFilterQuestionExists(qIndex)
+                                                          RequireState(Blovote.State.New) {
+        filterQuestions[qIndex].points.push(qText);
+        if (isRight) {
+            filterQuestions[qIndex].correctPoints.push(qIndex);
+        }
+    }
+
+    function addQuestionPoint(uint qIndex, bytes qText) external
                                                           RequireQuestionExist(qIndex)
                                                           RequireState(Blovote.State.New) {
 
         require(canHavePoints(quests[qIndex].qtype), "Unable to add points for answer of this type");
-        quests[qIndex].points.push(ansText);
+        quests[qIndex].points.push(qText);
     }
 
-    function getQuestionPointsCount(uint qIndex) external view returns (uint) {
+    function getFilterQuestionPointsCount(uint qIndex) external view RequireFilterQuestionExists(qIndex)
+                                                       returns (uint) {
+        return filterQuestions[qIndex].points.length;
+    }
+
+    function getQuestionPointsCount(uint qIndex) external view RequireQuestionExist(qIndex) returns (uint) {
         return quests[qIndex].points.length;
     }
 
-    function getQuestionPointInfo(uint qIndex, uint pointIndex) external view returns (bytes) {
-        uint len = quests[qIndex].points.length;
-        require(
-            pointIndex >= 0 && pointIndex < len,
-            "Point does not exist"
-        );
+    function getFilterQuestionPointInfo(uint qIndex, uint pIndex) external view
+            RequireFilterQuestionExists(qIndex)
+            RequireFilterQuestionPointExist(qIndex, pIndex) returns (bytes) {
 
+        return filterQuestions[qIndex].points[pIndex];
+    }
+
+    function getQuestionPointInfo(uint qIndex, uint pointIndex) external view
+                                                                RequireQuestionExist(qIndex)
+                                                                RequireQuestionPointExist(qIndex, pointIndex)
+                                                                returns (bytes) {
         return quests[qIndex].points[pointIndex];
     }
+
 
 
     function respondText(bytes answerText) external
