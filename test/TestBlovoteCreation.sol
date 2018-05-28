@@ -75,33 +75,6 @@ contract TestBlovoteCreation {
         assertEquals(blovote.getQuestionPointInfo(0, 2), point3);
     }
 
-    function testAddManyQuestionsWithPoints() public {
-        blovote.addQuestion(Blovote.QType.OneFromMany, qtitle);
-        blovote.addQuestion(Blovote.QType.ManyFromMany, qtitle2);
-
-        string memory str1 = "First point";
-        bytes memory point1 = bytes(str1);
-        string memory str2 = "Second point";
-        bytes memory point2 = bytes(str2);
-        string memory str3 = "Third point";
-        bytes memory point3 = bytes(str3);
-        string memory str4 = "Fourth point";
-        bytes memory point4 = bytes(str4);
-
-
-        blovote.addQuestionPoint(0, point1);
-        blovote.addQuestionPoint(1, point2);
-        blovote.addQuestionPoint(0, point3);
-        blovote.addQuestionPoint(1, point4);
-
-        assert(blovote.getQuestionPointsCount(0) == 2);
-        assert(blovote.getQuestionPointsCount(1) == 2);
-        assertEquals(blovote.getQuestionPointInfo(0, 0), point1);
-        assertEquals(blovote.getQuestionPointInfo(0, 1), point3);
-        assertEquals(blovote.getQuestionPointInfo(1, 0), point2);
-        assertEquals(blovote.getQuestionPointInfo(1, 1), point4);
-
-    }
 
     function assertEquals(bytes a, bytes b) public pure returns (bool) {
         assert(a.length == b.length);

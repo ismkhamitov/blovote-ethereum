@@ -243,8 +243,6 @@ contract BlovoteImpl is Blovote {
 
 
     function respondText(bytes answerText) external
-                                           RequireQuestionExist(qIndex)
-                                           RequireNotAnswered(qIndex)
                                            RequireState(Blovote.State.Active) {
 
         uint respondsIndex = requestRespondentIndex(msg.sender);
@@ -274,8 +272,6 @@ contract BlovoteImpl is Blovote {
     }
 
     function respondNumbers(uint8[] numbers) external
-                                             RequireQuestionExist(qIndex)
-                                             RequireNotAnswered(qIndex)
                                              RequireState(Blovote.State.Active) {
 
         uint respondsIndex = requestRespondentIndex(msg.sender);
@@ -319,7 +315,7 @@ contract BlovoteImpl is Blovote {
     }
 
     function requestRespondentIndex(address respondentAddress) internal RequireAvailable returns (uint index) {
-        if (zeroIndexRespondent == address(0)) {
+        if (zeroIndexRespondent == address(0)  || zeroIndexRespondent == respondentAddress) {
             zeroIndexRespondent = respondentAddress;
             if (responds.length == 0) {
                 responds.push(Respond(respondentAddress, false, new bytes[](0)));
@@ -348,13 +344,14 @@ contract BlovoteImpl is Blovote {
     }
 
     function isPaid() internal view RequireParticipant returns (bool) {
-        return !responds[respondentsIndices[msg.sender]].paid;
+        return responds[requestRespondentIndex(msg.sender)].paid;
     }
 
     function payRewardIfNeeded() internal RequireParticipant {
-        if (!isPaid() && responds[respondentsIndices[msg.sender]].respondsData.length == quests.length) {
-            msg.sender.transfer(rewardSize);
-            responds[respondentsIndices[msg.sender]].paid = true;
+        uint respondIndex = requestRespondentIndex(msg.sender);
+        if (!isPaid() && responds[respondIndex].respondsData.length == quests.length) {
+            msg.sender.send(rewardSize);
+            responds[respondIndex].paid = true;
         }
     }
 }

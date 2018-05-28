@@ -4,7 +4,7 @@ import "../contracts/BloGodImpl.sol";
 
 contract TestBloGod {
 
-    uint public initialBalance = 0.01 ether;
+    uint public initialBalance = 0.1 ether;
 
     BloGod blogod;
 
@@ -17,12 +17,13 @@ contract TestBloGod {
         string memory str = "Hey, its test survey!";
         bytes memory title = bytes(str);
 
-        address created = blogod.createNewSurvey(title, 100);
+        address created = blogod.createNewSurvey.value(100)(title, 100);
 
         assert(blogod.getSurveysNumber() == 1);
 
         Blovote blovote = Blovote(created);
         assertEquals(title, blovote.title());
+        assert(blovote.rewardSize() == 1);
     }
 
 
@@ -34,8 +35,8 @@ contract TestBloGod {
         string memory str3 = "Third survey";
         bytes memory title3 = bytes(str3);
 
-        address second = blogod.createNewSurvey(title2, 42);
-        address third = blogod.createNewSurvey(title3, 667);
+        address second = blogod.createNewSurvey.value(42)(title2, 42);
+        address third = blogod.createNewSurvey.value(667)(title3, 667);
 
         assert(blogod.getSurveysNumber() - initialNumber == 2);
 
