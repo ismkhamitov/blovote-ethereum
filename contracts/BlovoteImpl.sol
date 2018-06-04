@@ -32,7 +32,7 @@ contract BlovoteImpl is Blovote {
     uint32 public requiredRespondentsCount;
 
     Blovote.State state;
-    address creator;
+    address public creator;
     bytes public title;
     uint creationTime;
     uint public rewardSize;
