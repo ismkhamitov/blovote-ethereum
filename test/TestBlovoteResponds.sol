@@ -38,8 +38,7 @@ contract TestBlovoteResponds {
 
         assert(blovote.currentRespondentsCount() == 1);
 
-        bytes memory actualData;
-        ( , actualData) = blovote.getRespondData(0, 0);
+        bytes memory actualData = blovote.getRespondData(0, 0);
 
         assertEquals(actualData, respondText);
     }
@@ -57,8 +56,7 @@ contract TestBlovoteResponds {
 
         assert(blovote.currentRespondentsCount() == 1);
 
-        bytes memory actualData;
-        ( , actualData) = blovote.getRespondData(0, 0);
+        bytes memory actualData = blovote.getRespondData(0, 0);
 
         assert(actualData.length == 1);
         assert(uint8(actualData[0]) == 42);

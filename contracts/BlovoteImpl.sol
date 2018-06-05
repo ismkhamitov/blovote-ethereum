@@ -259,16 +259,16 @@ contract BlovoteImpl is Blovote {
         handleRespondAdded();
     }
 
-    function getRespondData(uint qIndex, uint respondentIndex) external
+    function getRespondData(uint qIndex, uint respondentIndex) external view
                                                 RequireQuestionExist(qIndex)
                                                 RequireRespondentExists(respondentIndex)
-                                                RequireState(Blovote.State.Active) returns (address, bytes) {
+                                                RequireState(Blovote.State.Active) returns (bytes) {
         require(
             responds[respondentIndex].respondsData.length > qIndex,
             "Respondent did not answered to that question!"
         );
 
-        return (responds[respondentIndex].respondentAddress, responds[respondentIndex].respondsData[qIndex]);
+        return responds[respondentIndex].respondsData[qIndex];
     }
 
     function respondNumbers(uint8[] numbers) external

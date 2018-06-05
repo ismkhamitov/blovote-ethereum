@@ -79,9 +79,7 @@ contract TestBlovoteCreation2 {
 
         assert(blovote.currentRespondentsCount() == 1);
 
-        address addr;
-        bytes memory ans;
-        (addr, ans) = blovote.getRespondData(0, 0);
+        bytes memory ans = blovote.getRespondData(0, 0);
 
         assert(uint(ans[0]) == 1);
 

@@ -55,7 +55,7 @@ contract Blovote {
 
     function respondNumbers(uint8[] numbers) external;
 
-    function getRespondData(uint qIndex, uint respondIndex) external returns (address, bytes);
+    function getRespondData(uint qIndex, uint respondIndex) external view returns (bytes);
 
 
 
